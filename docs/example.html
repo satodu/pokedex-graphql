@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon GraphQL API</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  >
+  <!-- GSAP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body class="bg-light">
+  <div class="container py-5">
+    <h1 class="text-center mb-4">Pokedex GraphQL API</h1>
+
+    <!-- Search Form -->
+    <div class="mb-4">
+      <input
+        type="text"
+        id="pokemon-name"
+        class="form-control"
+        placeholder="Enter Pokémon Name (e.g., Pikachu)"
+      />
+      <button class="btn btn-primary mt-2 w-100" onclick="searchPokemon()">Search Pokémon</button>
+    </div>
+
+    <!-- Pokémon Info -->
+    <div id="pokemon-info" class="card d-none">
+      <div class="card-body">
+        <!-- Images Section -->
+        <div class="row text-center">
+          <div class="col-md-6">
+            <img id="pokemon-sprite" src="" alt="Pokémon Sprite" class="img-fluid mb-3" style="max-width: 150px;">
+            <p>Normal</p>
+          </div>
+          <div class="col-md-6">
+            <img id="pokemon-shiny-sprite" src="" alt="Shiny Sprite" class="img-fluid mb-3" style="max-width: 150px;">
+            <p>Shiny</p>
+          </div>
+        </div>
+        <!-- Basic Info -->
+        <h2 id="pokemon-title" class="card-title text-center"></h2>
+        <p id="pokemon-id" class="text-muted text-center"></p>
+        <div class="text-center">
+          <p id="pokemon-types"></p>
+          <p id="pokemon-weight"></p>
+          <p id="pokemon-height"></p>
+        </div>
+        <!-- Attacks Table -->
+        <h3 class="text-center mt-4">Attacks</h3>
+        <table class="table table-striped table-hover table-bordered table-dark">
+          <thead>
+            <tr>
+              <th class="text-center">Level</th>
+              <th class="text-center">Name</th>
+              <th class="text-center">Type</th>
+              <th class="text-center">Base Power</th>
+              <th class="text-center">Accuracy</th>
+            </tr>
+          </thead>
+          <tbody id="pokemon-attacks">
+            <!-- Dynamic Rows -->
+          </tbody>
+        </table>
+        <!-- Base Stats Table -->
+        <h3 class="text-center mt-4">Base Stats</h3>
+        <table class="table table-striped table-hover table-bordered table-dark">
+          <thead>
+            <tr>
+              <th class="text-center">Stat</th>
+              <th class="text-center">Value</th>
+            </tr>
+          </thead>
+          <tbody id="pokemon-base-stats">
+            <!-- Dynamic Rows -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script -->
+  <script>
+    async function searchPokemon() {
+      const name = document.getElementById('pokemon-name').value.trim().toLowerCase();
+      if (!name) {
+        alert('Please enter a Pokémon name!');
+        return;
+      }
+
+      const pokemonInfo = document.getElementById('pokemon-info');
+      const title = document.getElementById('pokemon-title');
+      const sprite = document.getElementById('pokemon-sprite');
+      const shinySprite = document.getElementById('pokemon-shiny-sprite');
+      const weight = document.getElementById('pokemon-weight');
+      const height = document.getElementById('pokemon-height');
+      const types = document.getElementById('pokemon-types');
+      const attacksTable = document.getElementById('pokemon-attacks');
+      const baseStatsTable = document.getElementById('pokemon-base-stats');
+
+      try {
+        const response = await fetch(`/pokemon?name=${name}`);
+        const data = await response.json();
+
+        if (!response.ok || !data.id) {
+          throw new Error('Pokémon not found');
+        }
+
+        // Update Basic Info
+        title.textContent = data.name;
+        sprite.src = data.sprite;
+        sprite.alt = `${data.name} Sprite`;
+        shinySprite.src = data.shinySprite;
+        shinySprite.alt = `Shiny ${data.name} Sprite`;
+        weight.textContent = `Weight: ${data.weight} kg`;
+        height.textContent = `Height: ${data.height} m`;
+
+        // Types as Badges
+        types.innerHTML = data.types
+          .map(type => `<span class="badge bg-primary mx-1">${type}</span>`)
+          .join('');
+
+        // Populate Attacks Table
+        attacksTable.innerHTML = '';
+        data.attacks.sort((a, b) => a.level - b.level).forEach(attack => {
+          const row = `
+            <tr>
+              <td class="text-center">${attack.level}</td>
+              <td class="text-center">${attack.name}</td>
+              <td class="text-center"><span class="badge bg-secondary">${attack.type}</span></td>
+              <td class="text-center">${attack.basePower}</td>
+              <td class="text-center">${attack.accuracy}%</td>
+            </tr>
+          `;
+          attacksTable.insertAdjacentHTML('beforeend', row);
+        });
+
+        // Populate Base Stats Table
+        baseStatsTable.innerHTML = '';
+        Object.entries(data.baseStats).forEach(([stat, value]) => {
+          const row = `
+            <tr>
+              <td class="text-center">${stat.toUpperCase()}</td>
+              <td class="text-center">${value}</td>
+            </tr>
+          `;
+          baseStatsTable.insertAdjacentHTML('beforeend', row);
+        });
+
+        // Show and Animate the Pokémon Info Card
+        pokemonInfo.classList.remove('d-none');
+        gsap.from("#pokemon-info", { duration: 1, opacity: 0, y: 50, ease: "power3.out" });
+        gsap.from("table", { duration: 1, opacity: 0, stagger: 0.2, ease: "power3.out" });
+      } catch (error) {
+        alert(error.message);
+        pokemonInfo.classList.add('d-none');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+{
+    "name": "pokemon-graphql-api",
+    "version": "1.0.0",
+    "description": "Pacote para consumir a API de Pokémon com GraphQL",
+    "main": "index.js",
+    "type": "module",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/seu-usuario/pokemon-graphql-api.git"
+    },
+    "keywords": [
+        "pokemon",
+        "graphql",
+        "api"
+    ],
+    "author": "Seu Nome",
+    "license": "MIT",
+    "dependencies": {
+        "express": "^4.21.2",
+        "graphql": "^16.9.0",
+        "node-fetch": "^3.3.2"
+    }
+}
