@@ -1,5 +1,5 @@
-import { fetchGraphQL } from '../src/apiClient.js';
-import { GET_POKEMON } from '../src/queries/getPokemon.js';
+import { fetchGraphQL } from './js/apiClient.js';
+import { GET_POKEMON } from './js/getPokemon.js';
 
 async function fetchPokemon() {
   const name = document.getElementById('pokemon-name').value.trim().toLowerCase();
