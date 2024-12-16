@@ -1,7 +1,3 @@
-Aqui está um **README.md** em inglês, bem formatado, com informações do projeto e a URL de teste:
-
----
-
 ## **Pokédex GraphQL**
 
 A simple Pokédex web application built with **GraphQL** and JavaScript, allowing you to fetch and display Pokémon details.
